@@ -11,4 +11,13 @@ logs:
 	docker-compose logs -f
 
 migrate:
-	docker exec -it api_reciclagem npx sequelize-cli db:migrate
+	docker exec -it extension_api_app npx sequelize-cli db:migrate
+
+migrate-undo:
+	docker exec -it extension_api_app npx sequelize-cli db:migrate:undo:all
+
+seed:
+	docker exec -it extension_api_app npx sequelize-cli db:seed:all
+
+seed-undo:
+	docker exec -it extension_api_app npx sequelize-cli db:seed:undo:all
