@@ -1,23 +1,32 @@
-build:
-	docker-compose build
+DOCKER_COMPOSE = docker-compose
+APP_CONTAINER = extension_api_app
 
 up:
-	docker-compose up -d
+	$(DOCKER_COMPOSE) up --build -d
 
 down:
-	docker-compose down
+	$(DOCKER_COMPOSE) down
 
 logs:
-	docker-compose logs -f
+	$(DOCKER_COMPOSE) logs -f
 
 migrate:
-	docker exec -it extension_api_app npx sequelize-cli db:migrate
-
-migrate-undo:
-	docker exec -it extension_api_app npx sequelize-cli db:migrate:undo:all
+	$(DOCKER_COMPOSE) exec $(APP_CONTAINER) npx sequelize-cli db:migrate --config src/config/config.js --migrations-path src/migrations
 
 seed:
-	docker exec -it extension_api_app npx sequelize-cli db:seed:all
+	$(DOCKER_COMPOSE) exec $(APP_CONTAINER) npx sequelize-cli db:seed:all --config src/config/config.js
 
-seed-undo:
-	docker exec -it extension_api_app npx sequelize-cli db:seed:undo:all
+reset-db:
+	$(DOCKER_COMPOSE) exec $(APP_CONTAINER) npx sequelize-cli db:migrate:undo:all --config src/config/config.js && \
+	$(DOCKER_COMPOSE) exec $(APP_CONTAINER) npx sequelize-cli db:migrate --config src/config/config.js --migrations-path src/migrations
+
+start:
+	$(DOCKER_COMPOSE) up --build
+
+stop:
+	$(DOCKER_COMPOSE) down
+
+clean:
+	$(DOCKER_COMPOSE) down -v && rm -rf node_modules
+
+setup: clean up migrate seed logs

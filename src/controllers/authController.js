@@ -7,14 +7,21 @@ class AuthController {
     try {
       const { name, email, password } = req.body;
 
+      console.log('Tentativa de registro com dados:', { name, email });
+
       const hashedPassword = await bcrypt.hash(password, 10);
+      console.log('Senha criptografada:', hashedPassword);
+
       const user = await User.create({ name, email, password: hashedPassword });
+      console.log('Usuário criado com sucesso:', user);
 
       res.status(201).json({ message: 'User registered successfully.' });
     } catch (error) {
-      res.status(500).json({ error: 'Failed to register user.' });
+      console.error('Erro ao registrar usuário:', error);
+      res.status(500).json({ error: error });
     }
   }
+
 
   static async login(req, res) {
     try {
@@ -28,7 +35,7 @@ class AuthController {
       const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
       res.json({ token });
     } catch (error) {
-      res.status(500).json({ error: 'Failed to log in.' });
+      res.status(500).json({ error: error });
     }
   }
 }
